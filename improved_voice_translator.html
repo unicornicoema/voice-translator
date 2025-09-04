@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гласов Преводач Pro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .permissions-info {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #856404;
+        }
+        
+        .translation-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            min-height: 500px;
+        }
+        
+        .input-section, .output-section {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-section {
+            border-color: #3182ce;
+        }
+        
+        .output-section {
+            border-color: #38a169;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            color: #2d3748;
+        }
+        
+        .language-selector {
+            margin-bottom: 20px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .text-area {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 300px;
+            padding: 20px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 18px;
+            line-height: 1.6;
+            resize: vertical;
+            background: white;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .mic-button {
+            background: linear-gradient(45deg, #e53e3e, #c53030);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+            position: relative;
+        }
+        
+        .mic-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+        }
+        
+        .mic-button.listening {
+            background: linear-gradient(45deg, #38a169, #2f855a);
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 4px 15px rgba(56, 161, 105, 0.3);
+        }
+        
+        .translate-button {
+            background: linear-gradient(45deg, #3182ce, #2c5282);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+        }
+        
+        .translate-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(49, 130, 206, 0.4);
+        }
+        
+        .clear-button {
+            background: linear-gradient(45deg, #718096, #4a5568);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(113, 128, 150, 0.3);
+        }
+        
+        .clear-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(113, 128, 150, 0.4);
+        }
+        
+        .auto-translate-toggle {
+            background: linear-gradient(45deg, #805ad5, #6b46c1);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(128, 90, 213, 0.3);
+        }
+        
+        .auto-translate-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(128, 90, 213, 0.4);
+        }
+        
+        .auto-translate-toggle.active {
+            background: linear-gradient(45deg, #38a169, #2f855a);
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #4a5568;
+            font-size: 18px;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+        }
+        
+        .shortcuts-info {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #234e52;
+        }
+        
+        .shortcuts-info h4 {
+            margin: 0 0 10px 0;
+            color: #2c7a7b;
+        }
+        
+        .shortcuts-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            margin: 0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .translation-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .text-area {
+                min-height: 200px;
+                font-size: 16px;
+            }
+        }
+        
+        .language-info {
+            background: #f0fff4;
+            border: 2px solid #68d391;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #22543d;
+        }
+        
+        .continuous-mode {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .continuous-mode input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .continuous-mode label {
+            font-weight: bold;
+            color: #4a5568;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Гласов Преводач Pro</h1>
+        
+        <div class="permissions-info" id="permissionsInfo">
+            <p><strong>⚠️ Важно:</strong> За да работи приложението непрекъснато, моля разрешете достъп до микрофона и изберете "Винаги разрешавай" за този сайт в настройките на браузъра.</p>
+        </div>
+        
+        <div class="translation-section">
+            <div class="input-section">
+                <div class="section-title">Говори тук:</div>
+                
+                <div class="language-selector">
+                    <select id="inputLanguage">
+                        <option value="en-US">🇺🇸 Английски (US)</option>
+                        <option value="en-GB">🇬🇧 Английски (UK)</option>
+                        <option value="fr-FR">🇫🇷 Френски</option>
+                        <option value="de-DE">🇩🇪 Немски</option>
+                        <option value="es-ES">🇪🇸 Испански</option>
+                        <option value="it-IT">🇮🇹 Италиански</option>
+                        <option value="ru-RU">🇷🇺 Руски</option>
+                        <option value="tr-TR">🇹🇷 Турски</option>
+                        <option value="ar-SA">🇸🇦 Арабски</option>
+                        <option value="zh-CN">🇨🇳 Китайски</option>
+                    </select>
+                </div>
+                
+                <div class="language-info">
+                    💡 <strong>Съвет:</strong> За най-добри резултати говорете ясно и не твърде бързо
+                </div>
+                
+                <div class="continuous-mode">
+                    <input type="checkbox" id="continuousMode">
+                    <label for="continuousMode">Непрекъснат режим</label>
+                </div>
+                
+                <textarea id="inputText" class="text-area" placeholder="Натисни микрофона и започни да говориш, или напиши текст тук..."></textarea>
+            </div>
+            
+            <div class="output-section">
+                <div class="section-title">Превод на български:</div>
+                <textarea id="outputText" class="text-area" placeholder="Преводът ще се появи тук автоматично..." readonly></textarea>
+                
+                <div class="continuous-mode">
+                    <input type="checkbox" id="autoTranslate" checked>
+                    <label for="autoTranslate">Автоматичен превод</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="micButton" class="mic-button" title="Ctrl+M">🎤 Започни да говориш</button>
+            <button id="translateButton" class="translate-button" title="Ctrl+T">🔄 Преведи</button>
+            <button id="clearButton" class="clear-button" title="Ctrl+D">🗑️ Изчисти</button>
+        </div>
+        
+        <div class="shortcuts-info">
+            <h4>🚀 Бързи клавиши:</h4>
+            <div class="shortcuts-list">
+                <div><strong>Ctrl+M:</strong> Старт/стоп микрофон</div>
+                <div><strong>Ctrl+T:</strong> Преведи текста</div>
+                <div><strong>Ctrl+D:</strong> Изчисти всичко</div>
+                <div><strong>Space:</strong> Бърз старт микрофон</div>
+                <div><strong>Enter:</strong> Преведи (в полето за текст)</div>
+                <div><strong>Esc:</strong> Спри микрофона</div>
+            </div>
+        </div>
+        
+        <div class="error" id="errorMessage"></div>
+        <div class="status" id="status">Готов за използване</div>
+    </div>
+
+    <script>
+        class VoiceTranslatorPro {
+            constructor() {
+                this.recognition = null;
+                this.isListening = false;
+                this.autoTranslate = true;
+                this.continuousMode = false;
+                this.permissionGranted = false;
+                this.initElements();
+                this.initSpeechRecognition();
+                this.bindEvents();
+                this.requestPermissions();
+            }
+            
+            initElements() {
+                this.micButton = document.getElementById('micButton');
+                this.translateButton = document.getElementById('translateButton');
+                this.clearButton = document.getElementById('clearButton');
+                this.inputText = document.getElementById('inputText');
+                this.outputText = document.getElementById('outputText');
+                this.inputLanguage = document.getElementById('inputLanguage');
+                this.status = document.getElementById('status');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.autoTranslateCheckbox = document.getElementById('autoTranslate');
+                this.continuousModeCheckbox = document.getElementById('continuousMode');
+                this.permissionsInfo = document.getElementById('permissionsInfo');
+            }
+            
+            async requestPermissions() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                    this.permissionGranted = true;
+                    this.permissionsInfo.style.display = 'none';
+                    this.status.textContent = '✅ Микрофонът е готов за използване!';
+                } catch (error) {
+                    this.showError('Моля, разрешете достъп до микрофона за да използвате гласовото разпознаване');
+                }
+            }
+            
+            initSpeechRecognition() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = true;
+                    this.recognition.maxAlternatives = 1;
+                    
+                    this.recognition.onstart = () => {
+                        this.isListening = true;
+                        this.micButton.classList.add('listening');
+                        this.micButton.innerHTML = '🔴 Слушам...';
+                        this.status.textContent = 'Слушам... Говори сега!';
+                        this.hideError();
+                    };
+                    
+                    this.recognition.onresult = (event) => {
+                        let finalTranscript = '';
+                        let interimTranscript = '';
+                        
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            const transcript = event.results[i][0].transcript;
+                            if (event.results[i].isFinal) {
+                                finalTranscript += transcript;
+                            } else {
+                                interimTranscript += transcript;
+                            }
+                        }
+                        
+                        // Добавяме към съществуващия текст ако е непрекъснат режим
+                        if (this.continuousMode && this.inputText.value) {
+                            this.inputText.value = this.inputText.value.trim() + ' ' + finalTranscript + interimTranscript;
+                        } else {
+                            this.inputText.value = finalTranscript + interimTranscript;
+                        }
+                        
+                        if (finalTranscript && this.autoTranslate) {
+                            this.translateText();
+                        }
+                    };
+                    
+                    this.recognition.onend = () => {
+                        this.isListening = false;
+                        this.micButton.classList.remove('listening');
+                        this.micButton.innerHTML = '🎤 Започни да говориш';
+                        
+                        if (this.continuousMode && !this.manualStop) {
+                            // Автоматично рестартиране в непрекъснат режим
+                            setTimeout(() => {
+                                if (this.continuousMode) {
+                                    this.startListening();
+                                }
+                            }, 1000);
+                        } else {
+                            this.status.textContent = 'Готов за използване';
+                        }
+                        this.manualStop = false;
+                    };
+                    
+                    this.recognition.onerror = (event) => {
+                        this.showError(`Грешка при разпознаването: ${this.getErrorMessage(event.error)}`);
+                        this.isListening = false;
+                        this.micButton.classList.remove('listening');
+                        this.micButton.innerHTML = '🎤 Започни да говориш';
+                        this.status.textContent = 'Грешка - опитай отново';
+                    };
+                } else {
+                    this.showError('Браузърът не поддържа гласово разпознаване');
+                    this.micButton.disabled = true;
+                }
+            }
+            
+            bindEvents() {
+                // Основни бутони
+                this.micButton.addEventListener('click', () => this.toggleListening());
+                this.translateButton.addEventListener('click', () => this.translateText());
+                this.clearButton.addEventListener('click', () => this.clearAll());
+                
+                // Настройки
+                this.inputLanguage.addEventListener('change', () => this.updateRecognitionLanguage());
+                this.autoTranslateCheckbox.addEventListener('change', (e) => {
+                    this.autoTranslate = e.target.checked;
+                });
+                this.continuousModeCheckbox.addEventListener('change', (e) => {
+                    this.continuousMode = e.target.checked;
+                    if (this.recognition) {
+                        this.recognition.continuous = this.continuousMode;
+                    }
+                });
+                
+                // Бързи клавиши
+                document.addEventListener('keydown', (e) => {
+                    // Не прихващаме клавиши ако потребителят пише
+                    if (document.activeElement === this.inputText) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            this.translateText();
+                        }
+                        return;
+                    }
+                    
+                    if (e.ctrlKey || e.metaKey) {
+                        switch (e.key.toLowerCase()) {
+                            case 'm':
+                                e.preventDefault();
+                                this.toggleListening();
+                                break;
+                            case 't':
+                                e.preventDefault();
+                                this.translateText();
+                                break;
+                            case 'd':
+                                e.preventDefault();
+                                this.clearAll();
+                                break;
+                        }
+                    } else {
+                        switch (e.key) {
+                            case ' ':
+                                if (document.activeElement !== this.inputText && document.activeElement !== this.outputText) {
+                                    e.preventDefault();
+                                    this.startListening();
+                                }
+                                break;
+                            case 'Escape':
+                                if (this.isListening) {
+                                    e.preventDefault();
+                                    this.stopListening();
+                                }
+                                break;
+                        }
+                    }
+                });
+                
+                this.inputText.addEventListener('input', () => {
+                    this.hideError();
+                    if (this.autoTranslate && this.inputText.value.trim()) {
+                        clearTimeout(this.autoTranslateTimer);
+                        this.autoTranslateTimer = setTimeout(() => {
+                            this.translateText();
+                        }, 1500);
+                    }
+                });
+            }
+            
+            toggleListening() {
+                if (this.isListening) {
+                    this.stopListening();
+                } else {
+                    this.startListening();
+                }
+            }
+            
+            startListening() {
+                if (!this.permissionGranted) {
+                    this.requestPermissions();
+                    return;
+                }
+                
+                if (this.recognition && !this.isListening) {
+                    this.updateRecognitionLanguage();
+                    try {
+                        this.recognition.start();
+                    } catch (error) {
+                        this.showError('Не мога да стартирам гласовото разпознаване. Моля, опитайте отново.');
+                    }
+                }
+            }
+            
+            stopListening() {
+                if (this.recognition && this.isListening) {
+                    this.manualStop = true;
+                    this.recognition.stop();
+                }
+            }
+            
+            updateRecognitionLanguage() {
+                if (this.recognition) {
+                    this.recognition.lang = this.inputLanguage.value;
+                    this.recognition.continuous = this.continuousMode;
+                }
+            }
+            
+            async translateText() {
+                const text = this.inputText.value.trim();
+                if (!text) {
+                    this.showError('Моля, въведи текст за превод');
+                    return;
+                }
+                
+                this.status.textContent = 'Превеждам...';
+                this.translateButton.innerHTML = '⏳ Превеждам...';
+                this.translateButton.disabled = true;
+                
+                try {
+                    const translation = await this.getTranslation(text);
+                    this.outputText.value = translation;
+                    this.status.textContent = 'Преводът е готов! 🎉';
+                } catch (error) {
+                    this.showError('Грешка при превода. Моля, опитай отново.');
+                    this.status.textContent = 'Грешка при превода';
+                } finally {
+                    this.translateButton.innerHTML = '🔄 Преведи';
+                    this.translateButton.disabled = false;
+                }
+            }
+            
+            async getTranslation(text) {
+                const sourceLang = this.inputLanguage.value.split('-')[0];
+                
+                // Опитваме с няколко безплатни API-та
+                try {
+                    // MyMemory Translation API
+                    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|bg`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data.responseStatus === 200 && data.responseData.translatedText) {
+                        return data.responseData.translatedText;
+                    }
+                } catch (error) {
+                    console.warn('MyMemory API failed:', error);
+                }
+                
+                // Резервен вариант - опростен превод
+                try {
+                    const libreTranslateUrl = 'https://libretranslate.de/translate';
+                    const response = await fetch(libreTranslateUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            q: text,
+                            source: sourceLang,
+                            target: 'bg',
+                            format: 'text'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.translatedText;
+                    }
+                } catch (error) {
+                    console.warn('LibreTranslate API failed:', error);
+                }
+                
+                // Най-основен резервен вариант
+                throw new Error('Всички услуги за превод са недостъпни');
+            }
+            
+            clearAll() {
+                this.inputText.value = '';
+                this.outputText.value = '';
+                this.hideError();
+                this.status.textContent = 'Готов за използване';
+                if (this.isListening) {
+                    this.stopListening();
+                }
+            }
+            
+            showError(message) {
+                this.errorMessage.textContent = message;
+                this.errorMessage.style.display = 'block';
+                setTimeout(() => this.hideError(), 8000);
+            }
+            
+            hideError() {
+                this.errorMessage.style.display = 'none';
+            }
+            
+            getErrorMessage(error) {
+                const errorMessages = {
+                    'no-speech': 'Не беше разпознат глас',
+                    'audio-capture': 'Няма достъп до микрофона',
+                    'not-allowed': 'Разрешението за микрофона е отказано',
+                    'network': 'Мрежова грешка',
+                    'service-not-allowed': 'Услугата не е разрешена'
+                };
+                return errorMessages[error] || error;
+            }
+        }
+        
+        // Инициализация при зареждане на страницата
+        document.addEventListener('DOMContentLoaded', () => {
+            const translator = new VoiceTranslatorPro();
+            
+            // Показваме информация за разрешения
+            setTimeout(() => {
+                if (!translator.permissionGranted && translator.permissionsInfo.style.display !== 'none') {
+                    translator.status.innerHTML = '⚡ <strong>Съвет:</strong> Разрешете достъп до микрофона за пълна функционалност';
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
